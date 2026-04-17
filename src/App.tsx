@@ -6,17 +6,21 @@ export function App() {
   const [leverValues, setLeverValues] = React.useState(Array(leverDigits).fill(0));
   return (
     <div className="app">
-      {leverValues.map(
-        (value, index) => <Lever key={index} value={value} setValue={(newValue) => {
-          setLever(index, newValue);
-        }} />
-      )}
+      {
+        leverValues.map(
+          (value, index) => <Lever key={index} value={value} setValue={
+            (newValue) => {
+              setDigit(leverValues, setLeverValues, index, newValue);
+            }
+          } />
+        )
+      }
     </div>
   );
-  function setLever(digit: number, newValue: number) {
-    const newLeverValues = [...leverValues];
-    newLeverValues[digit] = newValue;
-    setLeverValues(newLeverValues);
+  function setDigit(values: number[], setValues: React.Dispatch<React.SetStateAction<number[]>>, digit: number, newValue: number) {
+    const newValues = [...values];
+    newValues[digit] = newValue;
+    setValues(newValues);
   }
 }
 
