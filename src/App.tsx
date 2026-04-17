@@ -18,7 +18,7 @@ export function App() {
     <div className="app">
       <div style={{
         display: "grid",
-        gridTemplateColumns: ` 1fr repeat(${gridColumns}, 1fr) 1fr`,
+        gridTemplateColumns: `4em repeat(${gridColumns}, 1fr) 4em`,
         // gridTemplateRows: `repeat(2, 1fr)`,
       }}>
         {
@@ -35,50 +35,69 @@ export function App() {
           ).reverse()
         }
         <div style={{
-          gridColumn: 1 + dialLDigits + 1 + dialRDigits + 1,
+          gridColumnStart: 1 + dialLDigits + 1 + dialRDigits + 1,
+          gridColumnEnd: 1 + dialLDigits + 1 + dialRDigits + digitShiftMax + 1,
           gridRow: 1,
+          display: "grid",
+          gridTemplateRows: "1fr auto"
         }}>
-          <button onClick={() => crank(false)}>+</button><br />
-          <button onClick={() => crank(true)}>-</button><br />
-          <button onClick={() => setLeverValues(Array(leverDigits).fill(0))}>レバークリヤー</button>
+          <div style={{ gridRow: 2 }}>
+            <button onClick={() => crank(false)}>+ 加算</button><br />
+            <button onClick={() => crank(true)}>- 減算</button><br />
+            <button onClick={() => setLeverValues(Array(leverDigits).fill(0))}>レバークリヤー</button>
+          </div>
         </div>
         {
           dialRValues.map(
             (value, index) => <div className="dialR" key={index} style={{
               gridColumn: 1 + dialLDigits + 1 + dialRDigits + digitShift - index,
               gridRow: 2,
+              background: "black",
+              color: "white",
+              textAlign: "center",
             }}>{value}</div>
           ).reverse()
         }
-        <button onClick={
-          () => {
-            setDialRValues(Array(dialRDigits).fill(0));
-            if (renjou) {
-              setLeverValues(dialRValues.slice(0, leverDigits));
-              setRenjou(false);
-            }
-          }
-        } style={{
-          gridColumn: 1 + dialLDigits + 1 + dialRDigits + digitShift + 1,
+        <div style={{
+          gridColumnStart: 1 + dialLDigits + 1 + dialRDigits + digitShift + 1,
+          gridColumnEnd: 1 + dialLDigits + 1 + dialRDigits + digitShiftMax + 1 + 1,
           gridRow: 2,
-        }}>右帰零</button>
+        }}>
+          <button onClick={
+            () => {
+              setDialRValues(Array(dialRDigits).fill(0));
+              if (renjou) {
+                setLeverValues(dialRValues.slice(0, leverDigits));
+                setRenjou(false);
+              }
+            }
+          } style={{
+          }}>右帰零</button>
+        </div>
         {
           dialLValues.map(
             (value, index) => <div className="dialL" key={index} style={{
               gridColumn: 1 + dialLDigits + digitShift - index,
               gridRow: 2,
+              background: "black",
+              color: "white",
+              textAlign: "center",
             }}>{value}</div>
           ).reverse()
         }
-        <button onClick={
-          () => {
-            setClutch(0);
-            setDialLValues(Array(dialLDigits).fill(0));
-          }
-        } style={{
-          gridColumn: 1 + digitShift,
+        <div style={{
+          gridColumnStart: 1,
+          gridColumnEnd: 1 + digitShift + 1,
           gridRow: 2,
-        }}>左帰零</button>
+          textAlign: "right",
+        }}>
+          <button onClick={
+            () => {
+              setClutch(0);
+              setDialLValues(Array(dialLDigits).fill(0));
+            }
+          }>左帰零</button>
+        </div>
         <div style={{
           gridColumnStart: 1 + dialLDigits - 1,
           gridColumnEnd: 1 + dialLDigits + 2,
