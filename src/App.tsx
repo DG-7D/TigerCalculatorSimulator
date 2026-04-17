@@ -83,7 +83,9 @@ export function App() {
   function crank(sub: boolean = false) {
     const { sum, carry } = addValue(dialRValues, leverValues, sub, 13); // TODO: maxDigitsは桁送りしたら変わる
     setDialRValues(sum.slice(0, dialRDigits));
-    console.log('Carry:', carry);
+    if (carry !== 0) {
+      console.log("🔔");
+    }
 
     const sign = sub ? -1 : 1;
     if (clutch === 0) {
