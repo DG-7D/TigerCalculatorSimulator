@@ -1,8 +1,10 @@
 import React from 'react';
 
 const leverDigits = 10;
+const dialRDigits = 20;
+const clankDigits = leverDigits + 3;
 const dialLDigits = 11;
-const dialRDigits = 21;
+const digitShiftMax = Math.min(dialLDigits - 1, dialRDigits - leverDigits);
 
 export function App() {
   const [leverValues, setLeverValues] = React.useState(Array(leverDigits).fill(0));
@@ -10,6 +12,7 @@ export function App() {
   const [dialRValues, setDialRValues] = React.useState(Array(dialRDigits).fill(0));
   const [renjou, setRenjou] = React.useState(false);
   const [clutch, setClutch] = React.useState(0);
+  const [digitShift, setDigitShift] = React.useState(0);
   return (
     <div className="app">
       <button onClick={() => crank(false)}>+</button>
@@ -61,8 +64,14 @@ export function App() {
         連乗
         <input type="checkbox" disabled={leverValues.some(v => v !== 0)} checked={renjou} onChange={(e) => { setRenjou(e.target.checked) }} />
       </label>
+      <button onClick={() => shiftDigit(0)}>&gt;&gt;</button>
+      <button onClick={() => shiftDigit(digitShift - 1)}>&gt;</button>
+      <button onClick={() => shiftDigit(digitShift + 1)}>&lt;</button>
+      <button onClick={() => shiftDigit(digitShiftMax)}>&lt;&lt;</button>
+      <div>{digitShift}</div>
     </div>
   );
+
   function setDigit(values: number[], setValues: React.Dispatch<React.SetStateAction<number[]>>, digit: number, newValue: number) {
     const newValues = [...values];
     newValues[digit] = newValue;
@@ -81,8 +90,9 @@ export function App() {
   }
 
   function crank(sub: boolean = false) {
-    const { sum, carry } = addValue(dialRValues, leverValues, sub, 13); // TODO: maxDigitsは桁送りしたら変わる
-    setDialRValues(sum.slice(0, dialRDigits));
+    const toAdd = dialRValues.slice(digitShift, digitShift + clankDigits);
+    const { sum, carry } = addValue(toAdd, leverValues, sub);
+    setDialRValues(dialRValues.toSpliced(digitShift, sum.length, ...sum));
     if (carry !== 0) {
       console.log("🔔");
     }
@@ -90,10 +100,14 @@ export function App() {
     const sign = sub ? -1 : 1;
     if (clutch === 0) {
       setClutch(sign);
-      setDialLValues(addValue(dialLValues, [1]).sum);
+      setDialLValues(addValue(dialLValues, [10 ** digitShift]).sum);
     } else {
-      setDialLValues(addValue(dialLValues, [sign * clutch]).sum);
+      setDialLValues(addValue(dialLValues, [sign * clutch * 10 ** digitShift]).sum);
     }
+  }
+
+  function shiftDigit(shift: number) {
+    setDigitShift(Math.max(0, Math.min(digitShiftMax, shift)));
   }
 }
 
