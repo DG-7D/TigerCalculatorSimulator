@@ -5,6 +5,7 @@ const dialRDigits = 20;
 const clankDigits = leverDigits + 3;
 const dialLDigits = 11;
 const digitShiftMax = Math.min(dialLDigits - 1, dialRDigits - leverDigits);
+const gridColumns = 1 + dialLDigits + dialRDigits + digitShiftMax;
 
 export function App() {
   const [leverValues, setLeverValues] = React.useState(Array(leverDigits).fill(0));
@@ -15,19 +16,44 @@ export function App() {
   const [digitShift, setDigitShift] = React.useState(0);
   return (
     <div className="app">
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: ` 1fr repeat(${gridColumns}, 1fr) 1fr`,
+        // gridTemplateRows: `repeat(2, 1fr)`,
+      }}>
+        {
+          leverValues.map(
+            (value, index) => <Lever key={index} value={value} setValue={
+              (newValue) => {
+                setRenjou(false);
+                setDigit(leverValues, setLeverValues, index, newValue);
+              }
+            } style={{
+              gridColumn: 1 + dialLDigits + 1 + dialRDigits - index,
+              gridRow: 1,
+            }} />
+          )
+        }
+        {
+          dialRValues.map(
+            (value, index) => <div className="dialR" key={index} style={{
+              gridColumn: 1 + dialLDigits + 1 + dialRDigits + digitShift - index,
+              gridRow: 2,
+            }}>{value}</div>
+          )
+        }
+        {
+          dialLValues.map(
+            (value, index) => <div className="dialL" key={index} style={{
+              gridColumn: 1 + dialLDigits + digitShift - index,
+              gridRow: 2,
+            }}>{value}</div>
+          )
+        }
+      </div>
       <button onClick={() => crank(false)}>+</button>
       <button onClick={() => crank(true)}>-</button>
       <button onClick={() => setLeverValues(Array(leverDigits).fill(0))}>レバークリヤー</button>
-      {
-        leverValues.map(
-          (value, index) => <Lever key={index} value={value} setValue={
-            (newValue) => {
-              setRenjou(false);
-              setDigit(leverValues, setLeverValues, index, newValue);
-            }
-          } />
-        )
-      }
       <button onClick={
         () => {
           setDialRValues(Array(dialRDigits).fill(0));
@@ -37,11 +63,6 @@ export function App() {
           }
         }
       }>右帰零</button>
-      {
-        dialRValues.map(
-          (value, index) => <div className="dialR" key={index}>{value}</div>
-        )
-      }
       <div>{(() => {
         switch (clutch) {
           case 0: return "N";
@@ -49,11 +70,6 @@ export function App() {
           case -1: return "÷";
         }
       })()}</div>
-      {
-        dialLValues.map(
-          (value, index) => <div className="dialL" key={index}>{value}</div>
-        )
-      }
       <button onClick={
         () => {
           setClutch(0);
@@ -111,13 +127,17 @@ export function App() {
   }
 }
 
-function Lever({ value, setValue }: { value: number, setValue: (newValue: number) => void }) {
+function Lever({ value, setValue, style }: { value: number, setValue: (newValue: number) => void, style?: React.CSSProperties }) {
   return (
-    <div className="lever">
-      <button onClick={() => value === 0 || setValue(value - 1)}>-</button>
-      <button onClick={() => value === 9 || setValue(value + 1)}>+</button>
-      <input type="number" min={0} max={9} value={value} onChange={(e) => setValue(parseInt(e.target.value))} />
-      <input type="range" min={0} max={9} value={value} onChange={(e) => setValue(parseInt(e.target.value))} />
+    <div className="lever" style={style}>
+      <button onClick={() => value === 0 || setValue(value - 1)} style={{ display: "block" }}>-</button>
+      <button onClick={() => value === 9 || setValue(value + 1)} style={{ display: "block" }}>+</button>
+      <input type="number" min={0} max={9} value={value} onChange={(e) => setValue(parseInt(e.target.value))} style={{ display: "block" }} />
+      <input type="range" min={0} max={9} value={value} onChange={(e) => setValue(parseInt(e.target.value))} style={{
+        display: "block",
+        writingMode: "vertical-lr",
+        direction: "ltr",
+      }} />
     </div>
   );
 }
