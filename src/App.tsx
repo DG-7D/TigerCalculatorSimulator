@@ -32,59 +32,82 @@ export function App() {
               gridColumn: 1 + dialLDigits + 1 + dialRDigits - index,
               gridRow: 1,
             }} />
-          )
+          ).reverse()
         }
+        <div style={{
+          gridColumn: 1 + dialLDigits + 1 + dialRDigits + 1,
+          gridRow: 1,
+        }}>
+          <button onClick={() => crank(false)}>+</button><br />
+          <button onClick={() => crank(true)}>-</button><br />
+          <button onClick={() => setLeverValues(Array(leverDigits).fill(0))}>レバークリヤー</button>
+        </div>
         {
           dialRValues.map(
             (value, index) => <div className="dialR" key={index} style={{
               gridColumn: 1 + dialLDigits + 1 + dialRDigits + digitShift - index,
               gridRow: 2,
             }}>{value}</div>
-          )
+          ).reverse()
         }
+        <button onClick={
+          () => {
+            setDialRValues(Array(dialRDigits).fill(0));
+            if (renjou) {
+              setLeverValues(dialRValues.slice(0, leverDigits));
+              setRenjou(false);
+            }
+          }
+        } style={{
+          gridColumn: 1 + dialLDigits + 1 + dialRDigits + digitShift + 1,
+          gridRow: 2,
+        }}>右帰零</button>
         {
           dialLValues.map(
             (value, index) => <div className="dialL" key={index} style={{
               gridColumn: 1 + dialLDigits + digitShift - index,
               gridRow: 2,
             }}>{value}</div>
-          )
+          ).reverse()
         }
-      </div>
-      <button onClick={() => crank(false)}>+</button>
-      <button onClick={() => crank(true)}>-</button>
-      <button onClick={() => setLeverValues(Array(leverDigits).fill(0))}>レバークリヤー</button>
-      <button onClick={
-        () => {
-          setDialRValues(Array(dialRDigits).fill(0));
-          if (renjou) {
-            setLeverValues(dialRValues.slice(0, leverDigits));
-            setRenjou(false);
+        <button onClick={
+          () => {
+            setClutch(0);
+            setDialLValues(Array(dialLDigits).fill(0));
           }
-        }
-      }>右帰零</button>
-      <div>{(() => {
-        switch (clutch) {
-          case 0: return "N";
-          case 1: return "×";
-          case -1: return "÷";
-        }
-      })()}</div>
-      <button onClick={
-        () => {
-          setClutch(0);
-          setDialLValues(Array(dialLDigits).fill(0));
-        }
-      }>左帰零</button>
+        } style={{
+          gridColumn: 1 + digitShift,
+          gridRow: 2,
+        }}>左帰零</button>
+        <div style={{
+          gridColumnStart: 1 + dialLDigits - 1,
+          gridColumnEnd: 1 + dialLDigits + 2,
+          gridRow: 1,
+          width: "100%",
+          display: "grid",
+          gridTemplateColumns: "repeat(3, 1fr)",
+          gridTemplateRows: "1fr auto auto auto",
+        }}
+        >
+          <div style={{ gridColumn: 1, gridRow: 2 }}>×</div>
+          <div style={{ gridColumn: 3, gridRow: 2 }}>÷</div>
+          <div style={{ gridColumn: "1 / 4", gridRow: 3 }}>
+            <input type="range" min={-1} max={1} value={clutch} onChange={(e) => setClutch(parseInt(e.target.value))} style={{
+              width: "100%",
+              direction: "rtl",
+            }} />
+          </div>
+          <div style={{ gridColumn: 2, gridRow: 4, textAlign: "center" }}>▽</div>
+        </div>
+      </div>
       <label>
         連乗
         <input type="checkbox" disabled={leverValues.some(v => v !== 0)} checked={renjou} onChange={(e) => { setRenjou(e.target.checked) }} />
       </label>
-      <button onClick={() => shiftDigit(0)}>&gt;&gt;</button>
-      <button onClick={() => shiftDigit(digitShift - 1)}>&gt;</button>
-      <button onClick={() => shiftDigit(digitShift + 1)}>&lt;</button>
-      <button onClick={() => shiftDigit(digitShiftMax)}>&lt;&lt;</button>
-      <div>{digitShift}</div>
+      <button onClick={() => shiftDigit(0)}>&lt;&lt;</button>
+      <button onClick={() => shiftDigit(digitShift - 1)}>&lt;</button>
+      <button onClick={() => shiftDigit(digitShift + 1)}>&gt;</button>
+      <button onClick={() => shiftDigit(digitShiftMax)}>&gt;&gt;</button>
     </div>
   );
 
@@ -135,8 +158,7 @@ function Lever({ value, setValue, style }: { value: number, setValue: (newValue:
       <input type="number" min={0} max={9} value={value} onChange={(e) => setValue(parseInt(e.target.value))} style={{ display: "block" }} />
       <input type="range" min={0} max={9} value={value} onChange={(e) => setValue(parseInt(e.target.value))} style={{
         display: "block",
-        writingMode: "vertical-lr",
-        direction: "ltr",
+        writingMode: "vertical-rl",
       }} />
     </div>
   );
