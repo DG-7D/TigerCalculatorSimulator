@@ -8,20 +8,32 @@ export function App() {
   const [leverValues, setLeverValues] = React.useState(Array(leverDigits).fill(0));
   const [dialLValues, setDialLValues] = React.useState(Array(dialLDigits).fill(0));
   const [dialRValues, setDialRValues] = React.useState(Array(dialRDigits).fill(0));
+  const [renjou, setRenjou] = React.useState(false);
   const [clutch, setClutch] = React.useState(0);
   return (
     <div className="app">
       <button onClick={() => crank(false)}>+</button>
       <button onClick={() => crank(true)}>-</button>
+      <button onClick={() => setLeverValues(Array(leverDigits).fill(0))}>レバークリヤー</button>
       {
         leverValues.map(
           (value, index) => <Lever key={index} value={value} setValue={
             (newValue) => {
+              setRenjou(false);
               setDigit(leverValues, setLeverValues, index, newValue);
             }
           } />
         )
       }
+      <button onClick={
+        () => {
+          setDialRValues(Array(dialRDigits).fill(0));
+          if (renjou) {
+            setLeverValues(dialRValues.slice(0, leverDigits));
+            setRenjou(false);
+          }
+        }
+      }>右帰零</button>
       {
         dialRValues.map(
           (value, index) => <div className="dialR" key={index}>{value}</div>
@@ -39,6 +51,16 @@ export function App() {
           (value, index) => <div className="dialL" key={index}>{value}</div>
         )
       }
+      <button onClick={
+        () => {
+          setClutch(0);
+          setDialLValues(Array(dialLDigits).fill(0));
+        }
+      }>左帰零</button>
+      <label>
+        連乗
+        <input type="checkbox" disabled={leverValues.some(v => v !== 0)} checked={renjou} onChange={(e) => { setRenjou(e.target.checked) }} />
+      </label>
     </div>
   );
   function setDigit(values: number[], setValues: React.Dispatch<React.SetStateAction<number[]>>, digit: number, newValue: number) {
