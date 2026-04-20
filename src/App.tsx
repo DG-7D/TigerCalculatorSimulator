@@ -106,6 +106,7 @@ export function App() {
           display: "grid",
           gridTemplateColumns: "repeat(3, 1fr)",
           gridTemplateRows: "1fr auto auto auto",
+          textAlign: "center",
         }}
         >
           <div style={{ gridColumn: 1, gridRow: 2 }}>×</div>
@@ -116,7 +117,7 @@ export function App() {
               direction: "rtl",
             }} />
           </div>
-          <div style={{ gridColumn: 2, gridRow: 4, textAlign: "center" }}>▽</div>
+          <div style={{ gridColumn: 2, gridRow: 4 }}>▽</div>
         </div>
       </div>
       <label>
@@ -171,10 +172,15 @@ export function App() {
 
 function Lever({ value, setValue, style }: { value: number, setValue: (newValue: number) => void, style?: React.CSSProperties }) {
   return (
-    <div className="lever" style={style}>
+    <div className="lever" style={{
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      ...style,
+    }}>
       <button onClick={() => value === 0 || setValue(value - 1)} style={{ display: "block" }}>-</button>
       <button onClick={() => value === 9 || setValue(value + 1)} style={{ display: "block" }}>+</button>
-      <input type="number" min={0} max={9} value={value} onChange={(e) => setValue(parseInt(e.target.value))} style={{ display: "block" }} />
+      <input type="number" min={0} max={9} value={value} onChange={(e) => setValue(parseInt(e.target.value))} style={{ display: "block", textAlign: "center" }} />
       <input type="range" min={0} max={9} value={value} onChange={(e) => setValue(parseInt(e.target.value))} style={{
         display: "block",
         writingMode: "vertical-rl",
