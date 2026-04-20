@@ -141,7 +141,7 @@ export function App() {
     let carry = 0;
     for (let i = 0; i < maxDigits; i++) {
       const digit = (a[i] || 0) + sign * (b[i] || 0) + carry;
-      sum[i] = (digit + 10) % 10;
+      sum[i] = ((digit % 10) + 10) % 10;
       carry = Math.floor(digit / 10);
     }
     return { sum, carry };
@@ -158,9 +158,9 @@ export function App() {
     const sign = sub ? -1 : 1;
     if (clutch === 0) {
       setClutch(sign);
-      setDialLValues(addValue(dialLValues, [10 ** digitShift]).sum);
+      setDialLValues(addValue(dialLValues, Array.from({ length: dialLDigits }, (_, i) => i === digitShift ? 1 : 0)).sum);
     } else {
-      setDialLValues(addValue(dialLValues, [sign * clutch * 10 ** digitShift]).sum);
+      setDialLValues(addValue(dialLValues, Array.from({ length: dialLDigits }, (_, i) => i === digitShift ? sign * clutch : 0)).sum);
     }
   }
 
