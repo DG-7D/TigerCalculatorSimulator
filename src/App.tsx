@@ -128,9 +128,9 @@ export function App() {
           gridTemplateRows: "1fr auto"
         }}>
           <div style={{ gridRow: 2 }}>
-            <button onClick={() => crank(false)}>+ 加算</button><br />
-            <button onClick={() => crank(true)}>- 減算</button><br />
-            <button onClick={() => setLeverValues(Array(leverDigits).fill(0))}>レバークリヤー</button>
+            <button onClick={() => crank(false)}>+ 加算 (Enter)</button><br />
+            <button onClick={() => crank(true)}>- 減算 (Backspace)</button><br />
+            <button onClick={() => setLeverValues(Array(leverDigits).fill(0))}>レバークリヤー (])</button>
           </div>
         </div>
         {
@@ -152,7 +152,7 @@ export function App() {
               }
             }
           } style={{
-          }}>右帰零</button>
+          }}>右帰零<br />(LShift)</button>
         </div>
         {
           dialLValues.map(
@@ -168,7 +168,7 @@ export function App() {
               setClutch(0);
               setDialLValues(Array(dialLDigits).fill(0));
             }
-          }>左帰零</button>
+          }>左帰零<br />(RShift)</button>
         </div>
         <div style={{
           gridArea: "clutch",
@@ -191,12 +191,13 @@ export function App() {
         </div>
       </div>
       <label>
-        連乗
-        <input type="checkbox" disabled={leverValues.some(v => v !== 0)} checked={renjou} onChange={(e) => { setRenjou(e.target.checked) }} />
+        連乗 (z)
+        <input type="checkbox" disabled={leverValues.some(v => v !== 0) || renjouHold} checked={renjou} onChange={(e) => { setRenjou(e.target.checked) }} />
       </label>
       <button onClick={() => shiftDigit(0)}>&lt;&lt;</button>
-      <button onClick={() => shiftDigit(digitShift - 1)}>&lt;</button>
-      <button onClick={() => shiftDigit(digitShift + 1)}>&gt;</button>
+      <button onClick={() => shiftDigit(digitShift - 1)}>&lt; (,)</button>
+      桁送り
+      <button onClick={() => shiftDigit(digitShift + 1)}>&gt; (.)</button>
       <button onClick={() => shiftDigit(digitShiftMax)}>&gt;&gt;</button>
     </div>
   );
