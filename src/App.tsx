@@ -17,66 +17,6 @@ export function App() {
   const onKeydown = React.useEffectEvent((e: KeyboardEvent) => {
     // console.log(e);
     switch (e.key) {
-      case "0":
-        setLeverValues(prev => prev.toSpliced(0, 1, Math.max(0, prev[0] - 1)));
-        break;
-      case "p":
-        setLeverValues(prev => prev.toSpliced(0, 1, Math.min(9, prev[0] + 1)));
-        break;
-      case "9":
-        setLeverValues(prev => prev.toSpliced(1, 1, Math.max(0, prev[1] - 1)));
-        break;
-      case "o":
-        setLeverValues(prev => prev.toSpliced(1, 1, Math.min(9, prev[1] + 1)));
-        break;
-      case "8":
-        setLeverValues(prev => prev.toSpliced(2, 1, Math.max(0, prev[2] - 1)));
-        break;
-      case "i":
-        setLeverValues(prev => prev.toSpliced(2, 1, Math.min(9, prev[2] + 1)));
-        break;
-      case "7":
-        setLeverValues(prev => prev.toSpliced(3, 1, Math.max(0, prev[3] - 1)));
-        break;
-      case "u":
-        setLeverValues(prev => prev.toSpliced(3, 1, Math.min(9, prev[3] + 1)));
-        break;
-      case "6":
-        setLeverValues(prev => prev.toSpliced(4, 1, Math.max(0, prev[4] - 1)));
-        break;
-      case "y":
-        setLeverValues(prev => prev.toSpliced(4, 1, Math.min(9, prev[4] + 1)));
-        break;
-      case "5":
-        setLeverValues(prev => prev.toSpliced(5, 1, Math.max(0, prev[5] - 1)));
-        break;
-      case "t":
-        setLeverValues(prev => prev.toSpliced(5, 1, Math.min(9, prev[5] + 1)));
-        break;
-      case "4":
-        setLeverValues(prev => prev.toSpliced(6, 1, Math.max(0, prev[6] - 1)));
-        break;
-      case "r":
-        setLeverValues(prev => prev.toSpliced(6, 1, Math.min(9, prev[6] + 1)));
-        break;
-      case "3":
-        setLeverValues(prev => prev.toSpliced(7, 1, Math.max(0, prev[7] - 1)));
-        break;
-      case "e":
-        setLeverValues(prev => prev.toSpliced(7, 1, Math.min(9, prev[7] + 1)));
-        break;
-      case "2":
-        setLeverValues(prev => prev.toSpliced(8, 1, Math.max(0, prev[8] - 1)));
-        break;
-      case "w":
-        setLeverValues(prev => prev.toSpliced(8, 1, Math.min(9, prev[8] + 1)));
-        break;
-      case "1":
-        setLeverValues(prev => prev.toSpliced(9, 1, Math.max(0, prev[9] - 1)));
-        break;
-      case "q":
-        setLeverValues(prev => prev.toSpliced(9, 1, Math.min(9, prev[9] + 1)));
-        break;
       case "Enter":
         crank(false);
         break;
@@ -138,10 +78,10 @@ export function App() {
       }}>
         {
           leverValues.map(
-            (value, index) => <Lever key={index} value={value} setValue={
+            (value, index) => <Lever key={index} value={value} place={index} setValue={
               (newValue) => {
                 setRenjou(false);
-                setDigit(leverValues, setLeverValues, index, newValue);
+                setDigit(leverValues, setLeverValues, index, clamp(newValue, 0, 9));
               }
             } style={{
               gridColumn: 1 + dialLDigits + 1 + dialRDigits - index,
@@ -283,24 +223,44 @@ export function App() {
   }
 }
 
-function Lever({ value, setValue, style }: { value: number, setValue: (newValue: number) => void, style?: React.CSSProperties }) {
+function Lever({ value, setValue, place, style }: { value: number, setValue: (newValue: number) => void, place: number, style?: React.CSSProperties }) {
+  const upKeys = ["0", "9", "8", "7", "6", "5", "4", "3", "2", "1"];
+  const downKeys = ["p", "o", "i", "u", "y", "t", "r", "e", "w", "q"];
+  const onKeydown = React.useEffectEvent((e: KeyboardEvent) => {
+    switch (e.key) {
+      case upKeys[place]:
+        setValue(value + 1);
+        break;
+      case downKeys[place]:
+        setValue(value - 1);
+        break;
+    }
+  })
+  React.useEffect(() => {
+    document.addEventListener("keydown", onKeydown);
+  }, []);
   return (
     <div className="lever" style={{
       display: "flex",
       flexDirection: "column",
-      alignItems: "center",
+      alignItems: "stretch",
+      textAlign: "center",
       ...style,
     }}>
-      <button onClick={() => value === 0 || setValue(value - 1)} style={{ display: "block" }}>-</button>
-      <button onClick={() => value === 9 || setValue(value + 1)} style={{ display: "block" }}>+</button>
-      <input type="number" min={0} max={9} value={value} onChange={(e) => setValue(parseInt(e.target.value))} style={{ display: "block", textAlign: "center" }} />
+      <div>{place + 1}</div>
+      <div style={{ color: "white", background: "black" }}>{value}</div>
       <input type="range" min={0} max={9} value={value} onChange={(e) => setValue(parseInt(e.target.value))} style={{
         display: "block",
         writingMode: "vertical-rl",
       }} />
+      <button onClick={() => setValue(value + 1)} style={{ display: "block" }}>+</button>
+      <button onClick={() => setValue(value - 1)} style={{ display: "block" }}>-</button>
     </div>
   );
 }
 
+function clamp(value: number, min: number, max: number) {
+  return Math.max(min, Math.min(max, value));
+}
 
 export default App;
