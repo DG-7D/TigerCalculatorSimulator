@@ -128,7 +128,7 @@ export function App() {
             () => {
               setDialRValues(Array(dialRDigits).fill(0));
               if (renjou) {
-                setLeverValues(dialRValues.slice(0, leverDigits));
+                setLeverValues(dialRValues.slice(0 + digitShift, leverDigits + digitShift));
                 setRenjou(false);
               }
             }
