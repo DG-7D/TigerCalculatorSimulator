@@ -11,6 +11,7 @@ export function App() {
   const [dialLValues, setDialLValues] = React.useState(Array(dialLDigits).fill(0));
   const [dialRValues, setDialRValues] = React.useState(Array(dialRDigits).fill(0));
   const [renjou, setRenjou] = React.useState(false);
+  const [renjouHold, setRenjouHold] = React.useState(false);
   const [clutch, setClutch] = React.useState(0);
   const [digitShift, setDigitShift] = React.useState(0);
   const onKeydown = React.useEffectEvent((e: KeyboardEvent) => {
@@ -30,7 +31,7 @@ export function App() {
           setDialRValues(prev => Array.from(prev, _ => 0));
           if (renjou) {
             setLeverValues(dialRValues.slice(0, leverDigits));
-            setRenjou(false);
+            !renjouHold && setRenjou(false);
           }
         }
         break;
@@ -43,6 +44,7 @@ export function App() {
         setClutch(0);
         setRenjou(false);
         setLeverValues(prev => Array.from(prev, _ => 0));
+        setDigitShift(0);
         break;
       case ",":
         shiftDigit(digitShift - 1);
@@ -58,14 +60,28 @@ export function App() {
       //   shiftDigit(digitShiftMax);
       //   break;
       case "z":
-        setRenjou(prev => !prev);
+        if (leverValues.some(v => v !== 0)) {
+          break;
+        }
+        setRenjou(true);
+        setRenjouHold(true);
+        break;
+    }
+  });
+  const onKeyup = React.useEffectEvent((e: KeyboardEvent) => {
+    switch (e.key) {
+      case "z":
+        setRenjou(false);
+        setRenjouHold(false);
         break;
     }
   });
   React.useEffect(() => {
     document.addEventListener("keydown", onKeydown);
+    document.addEventListener("keyup", onKeyup);
     return () => {
       document.removeEventListener("keydown", onKeydown);
+      document.removeEventListener("keyup", onKeyup);
     };
   }, []);
 
@@ -97,6 +113,9 @@ export function App() {
           leverValues.map(
             (value, index) => <Lever key={index} value={value} place={index} setValue={
               (newValue) => {
+                if (renjouHold) {
+                  return;
+                }
                 setRenjou(false);
                 setDigit(leverValues, setLeverValues, index, clamp(newValue, 0, 9));
               }
@@ -129,7 +148,7 @@ export function App() {
               setDialRValues(Array(dialRDigits).fill(0));
               if (renjou) {
                 setLeverValues(dialRValues.slice(0 + digitShift, leverDigits + digitShift));
-                setRenjou(false);
+                !renjouHold && setRenjou(false);
               }
             }
           } style={{
