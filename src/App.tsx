@@ -14,12 +14,121 @@ export function App() {
   const [renjou, setRenjou] = React.useState(false);
   const [clutch, setClutch] = React.useState(0);
   const [digitShift, setDigitShift] = React.useState(0);
+  const onKeydown = React.useEffectEvent((e: KeyboardEvent) => {
+    // console.log(e);
+    switch (e.key) {
+      case "0":
+        setLeverValues(prev => prev.toSpliced(0, 1, Math.max(0, prev[0] - 1)));
+        break;
+      case "p":
+        setLeverValues(prev => prev.toSpliced(0, 1, Math.min(9, prev[0] + 1)));
+        break;
+      case "9":
+        setLeverValues(prev => prev.toSpliced(1, 1, Math.max(0, prev[1] - 1)));
+        break;
+      case "o":
+        setLeverValues(prev => prev.toSpliced(1, 1, Math.min(9, prev[1] + 1)));
+        break;
+      case "8":
+        setLeverValues(prev => prev.toSpliced(2, 1, Math.max(0, prev[2] - 1)));
+        break;
+      case "i":
+        setLeverValues(prev => prev.toSpliced(2, 1, Math.min(9, prev[2] + 1)));
+        break;
+      case "7":
+        setLeverValues(prev => prev.toSpliced(3, 1, Math.max(0, prev[3] - 1)));
+        break;
+      case "u":
+        setLeverValues(prev => prev.toSpliced(3, 1, Math.min(9, prev[3] + 1)));
+        break;
+      case "6":
+        setLeverValues(prev => prev.toSpliced(4, 1, Math.max(0, prev[4] - 1)));
+        break;
+      case "y":
+        setLeverValues(prev => prev.toSpliced(4, 1, Math.min(9, prev[4] + 1)));
+        break;
+      case "5":
+        setLeverValues(prev => prev.toSpliced(5, 1, Math.max(0, prev[5] - 1)));
+        break;
+      case "t":
+        setLeverValues(prev => prev.toSpliced(5, 1, Math.min(9, prev[5] + 1)));
+        break;
+      case "4":
+        setLeverValues(prev => prev.toSpliced(6, 1, Math.max(0, prev[6] - 1)));
+        break;
+      case "r":
+        setLeverValues(prev => prev.toSpliced(6, 1, Math.min(9, prev[6] + 1)));
+        break;
+      case "3":
+        setLeverValues(prev => prev.toSpliced(7, 1, Math.max(0, prev[7] - 1)));
+        break;
+      case "e":
+        setLeverValues(prev => prev.toSpliced(7, 1, Math.min(9, prev[7] + 1)));
+        break;
+      case "2":
+        setLeverValues(prev => prev.toSpliced(8, 1, Math.max(0, prev[8] - 1)));
+        break;
+      case "w":
+        setLeverValues(prev => prev.toSpliced(8, 1, Math.min(9, prev[8] + 1)));
+        break;
+      case "1":
+        setLeverValues(prev => prev.toSpliced(9, 1, Math.max(0, prev[9] - 1)));
+        break;
+      case "q":
+        setLeverValues(prev => prev.toSpliced(9, 1, Math.min(9, prev[9] + 1)));
+        break;
+      case "Enter":
+        crank(false);
+        break;
+      case "Backspace":
+        crank(true);
+        break;
+      case "Shift":
+        if (e.code === "ShiftLeft") {
+          setDialLValues(prev => Array.from(prev, _ => 0));
+          setClutch(0);
+        } else if (e.code === "ShiftRight") {
+          setDialRValues(prev => Array.from(prev, _ => 0));
+          if (renjou) {
+            setLeverValues(dialRValues.slice(0, leverDigits));
+            setRenjou(false);
+          }
+        }
+        break;
+      case "]":
+        setLeverValues(prev => Array.from(prev, _ => 0));
+        break;
+      case "Escape":
+        setDialLValues(prev => Array.from(prev, _ => 0));
+        setDialRValues(prev => Array.from(prev, _ => 0));
+        setClutch(0);
+        setRenjou(false);
+        setLeverValues(prev => Array.from(prev, _ => 0));
+        break;
+      case ",":
+        shiftDigit(digitShift - 1);
+        break;
+      case ".":
+        shiftDigit(digitShift + 1);
+        break;
+      // いる???
+      // case "m":
+      //   shiftDigit(0);
+      //   break;
+      // case "/":
+      //   shiftDigit(digitShiftMax);
+      //   break;
+      case "z":
+        setRenjou(prev => !prev);
+        break;
+    }
+  });
   React.useEffect(() => {
     document.addEventListener("keydown", onKeydown);
     return () => {
       document.removeEventListener("keydown", onKeydown);
     };
-  });
+  }, []);
   return (
     <div className="app">
       <div style={{
@@ -136,116 +245,6 @@ export function App() {
       <button onClick={() => shiftDigit(digitShiftMax)}>&gt;&gt;</button>
     </div>
   );
-
-  function onKeydown(e: KeyboardEvent) {
-    // console.log(e);
-    switch (e.key) {
-      case "0":
-        setLeverValues(prev => prev.toSpliced(0, 1, Math.max(0, prev[0] - 1)));
-        break;
-      case "p":
-        setLeverValues(prev => prev.toSpliced(0, 1, Math.min(9, prev[0] + 1)));
-        break;
-      case "9":
-        setLeverValues(prev => prev.toSpliced(1, 1, Math.max(0, prev[1] - 1)));
-        break;
-      case "o":
-        setLeverValues(prev => prev.toSpliced(1, 1, Math.min(9, prev[1] + 1)));
-        break;
-      case "8":
-        setLeverValues(prev => prev.toSpliced(2, 1, Math.max(0, prev[2] - 1)));
-        break;
-      case "i":
-        setLeverValues(prev => prev.toSpliced(2, 1, Math.min(9, prev[2] + 1)));
-        break;
-      case "7":
-        setLeverValues(prev => prev.toSpliced(3, 1, Math.max(0, prev[3] - 1)));
-        break;
-      case "u":
-        setLeverValues(prev => prev.toSpliced(3, 1, Math.min(9, prev[3] + 1)));
-        break;
-      case "6":
-        setLeverValues(prev => prev.toSpliced(4, 1, Math.max(0, prev[4] - 1)));
-        break;
-      case "y":
-        setLeverValues(prev => prev.toSpliced(4, 1, Math.min(9, prev[4] + 1)));
-        break;
-      case "5":
-        setLeverValues(prev => prev.toSpliced(5, 1, Math.max(0, prev[5] - 1)));
-        break;
-      case "t":
-        setLeverValues(prev => prev.toSpliced(5, 1, Math.min(9, prev[5] + 1)));
-        break;
-      case "4":
-        setLeverValues(prev => prev.toSpliced(6, 1, Math.max(0, prev[6] - 1)));
-        break;
-      case "r":
-        setLeverValues(prev => prev.toSpliced(6, 1, Math.min(9, prev[6] + 1)));
-        break;
-      case "3":
-        setLeverValues(prev => prev.toSpliced(7, 1, Math.max(0, prev[7] - 1)));
-        break;
-      case "e":
-        setLeverValues(prev => prev.toSpliced(7, 1, Math.min(9, prev[7] + 1)));
-        break;
-      case "2":
-        setLeverValues(prev => prev.toSpliced(8, 1, Math.max(0, prev[8] - 1)));
-        break;
-      case "w":
-        setLeverValues(prev => prev.toSpliced(8, 1, Math.min(9, prev[8] + 1)));
-        break;
-      case "1":
-        setLeverValues(prev => prev.toSpliced(9, 1, Math.max(0, prev[9] - 1)));
-        break;
-      case "q":
-        setLeverValues(prev => prev.toSpliced(9, 1, Math.min(9, prev[9] + 1)));
-        break;
-      case "Enter":
-        crank(false);
-        break;
-      case "Backspace":
-        crank(true);
-        break;
-      case "Shift":
-        if (e.code === "ShiftLeft") {
-          setDialLValues(prev => Array.from(prev, _ => 0));
-          setClutch(0);
-        } else if (e.code === "ShiftRight") {
-          setDialRValues(prev => Array.from(prev, _ => 0));
-          if (renjou) {
-            setLeverValues(dialRValues.slice(0, leverDigits));
-            setRenjou(false);
-          }
-        }
-        break;
-      case "]":
-        setLeverValues(prev => Array.from(prev, _ => 0));
-        break;
-      case "Escape":
-        setDialLValues(prev => Array.from(prev, _ => 0));
-        setDialRValues(prev => Array.from(prev, _ => 0));
-        setClutch(0);
-        setRenjou(false);
-        setLeverValues(prev => Array.from(prev, _ => 0));
-        break;
-      case ",":
-        shiftDigit(digitShift - 1);
-        break;
-      case ".":
-        shiftDigit(digitShift + 1);
-        break;
-      // いる???
-      // case "m":
-      //   shiftDigit(0);
-      //   break;
-      // case "/":
-      //   shiftDigit(digitShiftMax);
-      //   break;
-      case "z":
-        setRenjou(prev => !prev);
-        break;
-    }
-  };
 
   function setDigit(_: number[], setValues: React.Dispatch<React.SetStateAction<number[]>>, digit: number, newValue: number) {
     setValues(prev => prev.toSpliced(digit, 1, newValue));
