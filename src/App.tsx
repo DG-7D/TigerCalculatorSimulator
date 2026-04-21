@@ -70,11 +70,10 @@ export function App() {
     };
   }, []);
   return (
-    <div className="app">
+    <div className="app" style={{ userSelect: "none" }}>
       <div style={{
         display: "grid",
-        gridTemplateColumns: `4em repeat(${gridColumns}, 1fr) 4em`,
-        // gridTemplateRows: `repeat(2, 1fr)`,
+        gridTemplateColumns: `4em repeat(${gridColumns}, 1.5em) 4em`,
       }}>
         {
           leverValues.map(
@@ -104,13 +103,15 @@ export function App() {
         </div>
         {
           dialRValues.map(
-            (value, index) => <div className="dialR" key={index} style={{
-              gridColumn: 1 + dialLDigits + 1 + dialRDigits + digitShift - index,
-              gridRow: 2,
-              background: "black",
-              color: "white",
-              textAlign: "center",
-            }}>{value}</div>
+            (value, index) =>
+              <div className="dialR" key={index} style={{
+                gridColumn: 1 + dialLDigits + 1 + dialRDigits + digitShift - index,
+                gridRow: 2,
+                textAlign: "center",
+              }}>
+                <div style={{ color: "white", background: "black", userSelect: "text" }}>{value}</div>
+                <div style={{ fontSize: "0.8em" }}>{index + 1}</div>
+              </div>
           ).reverse()
         }
         <div style={{
@@ -134,10 +135,11 @@ export function App() {
             (value, index) => <div className="dialL" key={index} style={{
               gridColumn: 1 + dialLDigits + digitShift - index,
               gridRow: 2,
-              background: "black",
-              color: "white",
               textAlign: "center",
-            }}>{value}</div>
+            }}>
+              <div style={{ color: "white", background: "black", userSelect: "text" }}>{value}</div>
+              <div style={{ fontSize: "0.8em" }}>{index + 1}</div>
+            </div>
           ).reverse()
         }
         <div style={{
@@ -247,8 +249,8 @@ function Lever({ value, setValue, place, style }: { value: number, setValue: (ne
       textAlign: "center",
       ...style,
     }}>
-      <div>{place + 1}</div>
-      <div style={{ color: "white", background: "black" }}>{value}</div>
+      <div style={{ fontSize: "0.8em" }}>{place + 1}</div>
+      <div style={{ color: "white", background: "black", userSelect: "text" }}>{value}</div>
       <input type="range" min={0} max={9} value={value} onChange={(e) => setValue(parseInt(e.target.value))} style={{
         display: "block",
         writingMode: "vertical-rl",
