@@ -30,7 +30,7 @@ export function App() {
         } else if (e.code === "ShiftRight") {
           setDialRValues(prev => Array.from(prev, _ => 0));
           if (renjou) {
-            setLeverValues(dialRValues.slice(0, leverDigits));
+            setLeverValues(dialRValues.slice(0 + digitShift, leverDigits + digitShift));
             !renjouHold && setRenjou(false);
           }
         }
