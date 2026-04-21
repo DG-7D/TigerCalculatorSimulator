@@ -5,7 +5,6 @@ const dialRDigits = 20;
 const clankDigits = leverDigits + 3;
 const dialLDigits = 11;
 const digitShiftMax = Math.min(dialLDigits - 1, dialRDigits - leverDigits);
-const gridColumns = 1 + dialLDigits + dialRDigits + digitShiftMax;
 
 export function App() {
   const [leverValues, setLeverValues] = React.useState(Array(leverDigits).fill(0));
@@ -69,11 +68,30 @@ export function App() {
       document.removeEventListener("keydown", onKeydown);
     };
   }, []);
+
+  const gridTemplateAreasArray = [
+    [
+      ...Array(1 + dialLDigits - 2).fill("."),
+      ...Array(3).fill("clutch"),
+      ...Array(dialRDigits - leverDigits).fill("."),
+      ...Array.from({ length: leverDigits }, (_, i) => `lever${i}`).toReversed(),
+      ...Array.from({ length: digitShiftMax + 1 }).fill("leverSide"),
+    ],
+    [
+      ...Array(1 + digitShift).fill("leftSide"),
+      ...Array.from({ length: dialLDigits }, (_, i) => `dialL${i}`).toReversed(),
+      ".",
+      ...Array.from({ length: dialRDigits }, (_, i) => `dialR${i}`).toReversed(),
+      ...Array(digitShiftMax - digitShift + 1).fill("rightSide"),
+    ],
+  ];
+
   return (
     <div className="app" style={{ userSelect: "none" }}>
       <div style={{
         display: "grid",
-        gridTemplateColumns: `4em repeat(${gridColumns}, 1.5em) 4em`,
+        gridTemplateColumns: `4em repeat(${dialLDigits + 1 + dialRDigits + digitShiftMax}, 1.5em) 4em`,
+        gridTemplateAreas: gridTemplateAreasArray.map(row => `"${row.join(" ")}"`).join(" "),
       }}>
         {
           leverValues.map(
@@ -82,16 +100,11 @@ export function App() {
                 setRenjou(false);
                 setDigit(leverValues, setLeverValues, index, clamp(newValue, 0, 9));
               }
-            } style={{
-              gridColumn: 1 + dialLDigits + 1 + dialRDigits - index,
-              gridRow: 1,
-            }} />
+            } style={{ gridArea: `lever${index}` }} />
           ).reverse()
         }
         <div style={{
-          gridColumnStart: 1 + dialLDigits + 1 + dialRDigits + 1,
-          gridColumnEnd: 1 + dialLDigits + 1 + dialRDigits + digitShiftMax + 1,
-          gridRow: 1,
+          gridArea: "leverSide",
           display: "grid",
           gridTemplateRows: "1fr auto"
         }}>
@@ -104,21 +117,13 @@ export function App() {
         {
           dialRValues.map(
             (value, index) =>
-              <div className="dialR" key={index} style={{
-                gridColumn: 1 + dialLDigits + 1 + dialRDigits + digitShift - index,
-                gridRow: 2,
-                textAlign: "center",
-              }}>
+              <div className="dialR" key={index} style={{ gridArea: `dialR${index}`, textAlign: "center" }}>
                 <div style={{ color: "white", background: "black", userSelect: "text" }}>{value}</div>
                 <div style={{ fontSize: "0.8em" }}>{index + 1}</div>
               </div>
           ).reverse()
         }
-        <div style={{
-          gridColumnStart: 1 + dialLDigits + 1 + dialRDigits + digitShift + 1,
-          gridColumnEnd: 1 + dialLDigits + 1 + dialRDigits + digitShiftMax + 1 + 1,
-          gridRow: 2,
-        }}>
+        <div style={{ gridArea: "rightSide", textAlign: "left" }}>
           <button onClick={
             () => {
               setDialRValues(Array(dialRDigits).fill(0));
@@ -132,22 +137,13 @@ export function App() {
         </div>
         {
           dialLValues.map(
-            (value, index) => <div className="dialL" key={index} style={{
-              gridColumn: 1 + dialLDigits + digitShift - index,
-              gridRow: 2,
-              textAlign: "center",
-            }}>
+            (value, index) => <div className="dialL" key={index} style={{ gridArea: `dialL${index}`, textAlign: "center", }}>
               <div style={{ color: "white", background: "black", userSelect: "text" }}>{value}</div>
               <div style={{ fontSize: "0.8em" }}>{index + 1}</div>
             </div>
           ).reverse()
         }
-        <div style={{
-          gridColumnStart: 1,
-          gridColumnEnd: 1 + digitShift + 1,
-          gridRow: 2,
-          textAlign: "right",
-        }}>
+        <div style={{ gridArea: "leftSide", textAlign: "right" }}>
           <button onClick={
             () => {
               setClutch(0);
@@ -156,9 +152,7 @@ export function App() {
           }>左帰零</button>
         </div>
         <div style={{
-          gridColumnStart: 1 + dialLDigits - 1,
-          gridColumnEnd: 1 + dialLDigits + 2,
-          gridRow: 1,
+          gridArea: "clutch",
           width: "100%",
           display: "grid",
           gridTemplateColumns: "repeat(3, 1fr)",
