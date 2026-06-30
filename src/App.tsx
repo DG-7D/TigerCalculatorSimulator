@@ -1,4 +1,5 @@
 import React from 'react';
+import bell from "../bell/bell.wav";
 
 const leverDigits = 10;
 const dialRDigits = 20;
@@ -7,6 +8,34 @@ const dialLDigits = 11;
 const digitShiftMax = Math.min(dialLDigits - 1, dialRDigits - leverDigits);
 
 export function App() {
+  const audioContextRef = React.useRef<AudioContext>(undefined);
+  const audioBufferRef = React.useRef<AudioBuffer>(undefined);
+  React.useEffect(() => {
+    audioContextRef.current = new AudioContext();
+    return () => {
+      audioContextRef.current?.close();
+    }
+  }, []);
+  React.useEffect(() => {
+    const audioContext = new AudioContext();
+    fetch(bell)
+      .then(response => response.arrayBuffer())
+      .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
+      .then(audioBuffer => {
+        audioBufferRef.current = audioBuffer;
+      });
+  }, []);
+  function playBell() {
+    if (!audioBufferRef.current || !audioContextRef.current) {
+      return;
+    }
+    const context = audioContextRef.current;
+    context.resume();
+    const source = new AudioBufferSourceNode(context, { buffer: audioBufferRef.current });
+    source.connect(context.destination);
+    source.start();
+  }
+
   const [leverValues, setLeverValues] = React.useState(Array(leverDigits).fill(0));
   const [dialLValues, setDialLValues] = React.useState(Array(dialLDigits).fill(0));
   const [dialRValues, setDialRValues] = React.useState(Array(dialRDigits).fill(0));
@@ -221,9 +250,7 @@ export function App() {
     const toAdd = dialRValues.slice(digitShift, digitShift + clankDigits);
     const { sum, carry } = addValue(toAdd, leverValues, sub);
     setDialRValues(dialRValues.toSpliced(digitShift, sum.length, ...sum));
-    if (carry !== 0) {
-      console.log("🔔");
-    }
+    if (carry !== 0) { playBell(); }
 
     const sign = sub ? -1 : 1;
     if (clutch === 0) {
